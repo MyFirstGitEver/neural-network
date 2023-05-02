@@ -3,10 +3,7 @@ package org.example;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -57,6 +54,65 @@ class ExcelReader {
         }
 
         return data;
+    }
+
+    public Pair<Vector, Vector>[] createLabeledDataset(
+            int labelCol, int sheetNum, double negativeLabel) {
+        Pair<Vector, Vector>[] dataset = new Pair[getRowCount() - 1];
+        HashMap<String, Integer>[] hms = new HashMap[workbook.getSheetAt(sheetNum).getRow(0).getLastCellNum() + 1];
+
+        for (int i = 0; i < dataset.length; i++) {
+            Object[] data;
+            try {
+                data = getRow(i + 1, sheetNum);
+            } catch (Exception e) {
+                break;
+            }
+
+            float[]  points = new float[data.length - 1];
+            Vector label = new Vector(2);
+            int index = 0;
+
+            for(int j=0;j<data.length;j++) {
+                double numericValue;
+
+                if(data[j] == null){
+                    numericValue = 0;
+                }
+                else if(data[j] instanceof String){
+                    if(hms[j] == null){
+                        hms[j] = new HashMap<>();
+                    }
+
+                    if(hms[j].get(data[j]) == null){
+                        hms[j].put((String) data[j], hms[j].size());
+                    }
+
+                    numericValue = hms[j].get(data[j]);
+                }
+                else{
+                    numericValue = (double) data[j];
+                }
+
+                if(labelCol == j) {
+                    if(numericValue == negativeLabel){
+                        label = new Vector(1.0f, 0.0f);
+                    }
+                    else{
+                        label = new Vector(0.0f, 1.0f);
+                    }
+
+                    continue;
+                }
+
+                points[index] = (float) numericValue;
+                index++;
+            }
+
+            dataset[i] = new Pair<>(new Vector(points), label);
+        }
+
+        return dataset;
     }
 
     public int getRowCount() {

@@ -3,62 +3,47 @@ package org.example;
 import java.util.Arrays;
 
 abstract class ActivationFunction {
-    private final int featureSize;
+    protected final int featureSize;
+    protected final int neurons;
 
-    ActivationFunction(int featureSize) {
+    ActivationFunction(int featureSize, int neurons) {
         this.featureSize = featureSize;
+        this.neurons = neurons;
     }
 
     abstract Vector out(Vector z);
-    abstract Vector derivativeAtZ(Vector z);
-    int featureSize() {
-        return featureSize;
-    }
+    abstract Vector derivativeAtZ(Vector z, Vector y);
+    abstract Vector[] getW();
+    abstract Vector getB();
 }
 
 public class DenseLayer {
     private final ActivationFunction function;
-    private final int neurons;
 
     private final Vector[] W;
     private final Vector B;
 
-    public DenseLayer(ActivationFunction function, int neurons) {
+    public DenseLayer(ActivationFunction function) {
         this.function = function;
-        this.neurons = neurons;
 
-        W = new Vector[neurons];
-        B = new Vector(neurons, 0);
-        B.randomise();
-
-        for(int i=0;i<W.length;i++) {
-            W[i] = new Vector(function.featureSize(), 0);
-            W[i].randomise();
-        }
+        W = function.getW();
+        B = function.getB();
     }
 
     public Pair<Vector, Vector> output(Vector v) {
-        if(v.size() != function.featureSize()) {
+        if(v.size() != W[0].size()) {
             throw new RuntimeException("Wrong input dimension!");
         }
 
         // Calculate z for activation function
-        float[] points = new float[neurons];
+        float[] points = new float[function.neurons];
 
-        for(int i=0;i<neurons;i++) {
+        for(int i=0;i<function.neurons;i++) {
             points[i] = W[i].dot(v) + B.x(i);
         }
 
         Vector z = new Vector(points);
         return new Pair<>(z, function.out(z));
-    }
-
-    public int numberOfNeurons() {
-        return neurons;
-    }
-
-    public int featureSize() {
-        return function.featureSize();
     }
 
     public void update(
@@ -78,11 +63,19 @@ public class DenseLayer {
         }
     }
 
-    public Vector derivativeByZ(Vector Z) {
-        return function.derivativeAtZ(Z);
+    public Vector derivativeByZ(Vector Z, Vector y) {
+        return function.derivativeAtZ(Z, y);
     }
 
     public Matrix transposeOfW() {
         return Matrix.transpose(W);
+    }
+
+    public Pair<Integer, Integer> wShape() {
+        return new Pair<>(W.length, W[0].size());
+    }
+
+    public int bShape() {
+        return B.size();
     }
 }

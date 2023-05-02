@@ -1,8 +1,8 @@
 package org.example;
 
-public class LinearActivation extends ActivationFunction {
-    LinearActivation(int featureSize) {
-        super(featureSize);
+public class LinearActivation extends MatrixActivation {
+    LinearActivation(int featureSize, int neurons) {
+        super(featureSize, neurons);
     }
 
     @Override
@@ -11,7 +11,8 @@ public class LinearActivation extends ActivationFunction {
     }
 
     @Override
-    public Vector derivativeAtZ(Vector z) {
+    public Vector derivativeAtZ(Vector z, Vector y) {
         return new Vector(z.size(), 1);
     }
+
 }

@@ -1,8 +1,8 @@
 package org.example;
 
-public class ReluActivation extends ActivationFunction {
-    ReluActivation(int featureSize) {
-        super(featureSize);
+public class ReluActivation extends MatrixActivation {
+    ReluActivation(int featureSize, int neurons) {
+        super(featureSize, neurons);
     }
 
     @Override
@@ -17,7 +17,7 @@ public class ReluActivation extends ActivationFunction {
     }
 
     @Override
-    public Vector derivativeAtZ(Vector z) {
+    public Vector derivativeAtZ(Vector z, Vector y) {
         Vector a = new Vector(z.size());
 
         for(int i=0;i<a.size();i++) {
