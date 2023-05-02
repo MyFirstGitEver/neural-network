@@ -13,6 +13,7 @@ public class LinearRegression {
         b = 0;
     }
 
+
     // R-squared error
     public float cost() {
         int n = dataset.length;

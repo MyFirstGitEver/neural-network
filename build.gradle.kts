@@ -14,6 +14,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("org.apache.poi:poi-ooxml:5.2.3")
+    implementation("org.tensorflow:tensorflow-core-platform:0.3.3")
 }
 
 tasks.test {

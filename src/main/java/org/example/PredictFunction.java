@@ -113,6 +113,29 @@ class Matrix {
         }
     }
 
+    public void add(Matrix matrix) throws Exception {
+        Pair<Integer, Integer> shape = matrix.shape();
+
+        if(entries.length != shape.first || entries[0].length != shape.second) {
+            throw new Exception("Can't add these two matrices");
+        }
+        for(int i=0;i<entries.length;i++) {
+            for(int j=0;j<entries[0].length;j++) {
+                entries[i][j] += matrix.entries[i][j];
+            }
+        }
+    }
+
+    public Matrix square() {
+        for(int i=0;i<entries.length;i++) {
+            for(int j=0;j<entries[0].length;j++) {
+                entries[i][j] *= entries[i][j];
+            }
+        }
+
+        return this;
+    }
+
     public Vector[] vectorize(boolean byRow) {
         if(byRow) {
             Vector[] vectors = new Vector[entries.length];
@@ -137,19 +160,21 @@ class Matrix {
         return vectors;
     }
 
-    public void scale(float scale) {
+    public Matrix scale(float scale) {
         for(int i=0;i<entries.length;i++) {
             for(int j=0;j<entries[0].length;j++) {
                 entries[i][j]  *= scale;
             }
         }
+
+        return this;
     }
 
     public static Matrix transpose(Vector[] mat) {
         float[][] answer = new float[mat[0].size()][mat.length];
 
         for(int i=0;i<mat.length;i++){
-            for(int j=i;j<mat[0].size();j++) {
+            for(int j=0;j<mat[0].size();j++) {
                 answer[j][i] = mat[i].x(j);
             }
         }
@@ -159,6 +184,7 @@ class Matrix {
 }
 
 class Vector {
+
     private final float[] points;
     Vector(float... points){
         this.points = points;
@@ -280,6 +306,38 @@ class Vector {
         for(int i=0;i<points.length;i++) {
             points[i] = random.nextFloat();
         }
+    }
+
+    Vector divide(Vector v, float eps) throws Exception {
+        Vector answer = new Vector(v.size());
+
+        if(v.size() != points.length) {
+            throw new Exception("Cam't divide");
+        }
+
+        for(int i=0;i<answer.size();i++) {
+            answer.setX(i, points[i] / (v.x(i) + eps));
+        }
+
+        return answer;
+    }
+
+    Vector square() {
+        for(int i=0;i<points.length;i++) {
+            points[i] *= points[i];
+        }
+
+        return this;
+    }
+
+    Vector sqrt() {
+        Vector v = new Vector(points.length);
+
+        for(int i=0;i<v.size();i++) {
+            v.setX(i, (float) Math.sqrt(points[i]));
+        }
+
+        return v;
     }
 
     @Override

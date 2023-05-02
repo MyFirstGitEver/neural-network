@@ -8,7 +8,7 @@ public class MSE implements SimpleNeuralNetwork.Loss {
         for(int i=0;i<v.size();i++) {
             float term = v.x(i) - y.x(i);
 
-            loss += term * term;
+            loss += (term * term) / 2;
         }
 
         return loss;
@@ -19,7 +19,7 @@ public class MSE implements SimpleNeuralNetwork.Loss {
         Vector v = new Vector(A.size());
 
         for(int i=0;i<v.size();i++) {
-            v.setX(i, 2 * (A.x(i) - Y.x(i)));
+            v.setX(i, (A.x(i) - Y.x(i)));
         }
 
         return v;

@@ -28,16 +28,13 @@ public class DenseLayer {
         this.neurons = neurons;
 
         W = new Vector[neurons];
-        B = new Vector(neurons, 1);
+        B = new Vector(neurons, 0);
         //B.randomise();
 
         for(int i=0;i<W.length;i++) {
-            W[i] = new Vector(function.featureSize(), 1);
+            W[i] = new Vector(function.featureSize(), 0);
             //W[i].randomise();
         }
-
-        System.out.println("Parameter W: \n" + Arrays.toString(W));
-        System.out.println("Parameter B: \n" + B);
     }
 
     public Pair<Vector, Vector> output(Vector v) {
@@ -64,12 +61,21 @@ public class DenseLayer {
         return function.featureSize();
     }
 
-    public void update(Vector[] gradientW, Vector gradientB) {
-        for(int i=0;i<gradientW.length;i++) {
-            W[i].subtract(gradientW[i]);
+    public void update(
+            Vector[] firstMomentW,
+            Vector[] secondMomentW,
+            Vector firstMomentB,
+            Vector secondMomentB,
+            float learningRate)
+            throws Exception {
+
+        for(int i=0;i<firstMomentW.length;i++) {
+            W[i].subtract(firstMomentW[i].divide(secondMomentW[i].sqrt(), 10e-8f).scaleBy(learningRate));
         }
 
-        B.subtract(gradientB);
+        for(int i=0;i<firstMomentB.size();i++) {
+            B.subtract(firstMomentB.divide(secondMomentB.sqrt(), 10e-8f).scaleBy(learningRate));
+        }
     }
 
     public Vector derivativeByZ(Vector Z) {
