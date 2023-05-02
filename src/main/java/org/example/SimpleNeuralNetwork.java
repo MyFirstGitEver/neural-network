@@ -54,7 +54,7 @@ public class SimpleNeuralNetwork {
 
         while((cost = cost()) > 0.001f && iteration < iter) {
             if(iteration % 30 == 0) {
-                //System.out.println(iteration + " iterations have passed. Cost: " + cost);
+                System.out.println(iteration + " iterations have passed. Cost: " + cost);
             }
 
             for(int j=0;j<dataset.length - 15;j+= 15) {
@@ -106,7 +106,6 @@ public class SimpleNeuralNetwork {
 
     private void computeGradient(int from, int to, Matrix[] dW, Vector[] dB) throws Exception {
         for(int iteration=from;iteration<=to;iteration++) {
-
             Pair<Vector, Vector> point = dataset[iteration];
 
             Pair<Vector, Vector>[] zAndA = new Pair[layers.length];

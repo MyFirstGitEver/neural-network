@@ -29,11 +29,11 @@ public class DenseLayer {
 
         W = new Vector[neurons];
         B = new Vector(neurons, 0);
-        //B.randomise();
+        B.randomise();
 
         for(int i=0;i<W.length;i++) {
             W[i] = new Vector(function.featureSize(), 0);
-            //W[i].randomise();
+            W[i].randomise();
         }
     }
 
