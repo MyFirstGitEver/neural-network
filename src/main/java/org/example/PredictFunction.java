@@ -4,15 +4,15 @@ import java.util.Arrays;
 import java.util.Random;
 
 abstract class PredictFunction {
-    abstract float predict(Vector x, Vector w, float b);
-    abstract  Vector derivativeByW(Vector w, float b, Pair<Vector, Float>[] dataset);
+    abstract double predict(Vector x, Vector w, double b);
+    abstract  Vector derivativeByW(Vector w, double b, Pair<Vector, Double>[] dataset);
 
-    public float derivativeByB(Vector w, float b, Pair<Vector, Float>[] dataset) {
-        float total = 0;
+    public double derivativeByB(Vector w, double b, Pair<Vector, Double>[] dataset) {
+        double total = 0;
         int datasetLength = dataset.length;
 
-        for (Pair<Vector, Float> vectorFloatPair : dataset) {
-            total += (predict(vectorFloatPair.first, w, b) - vectorFloatPair.second);
+        for (Pair<Vector, Double> vectordoublePair : dataset) {
+            total += (predict(vectordoublePair.first, w, b) - vectordoublePair.second);
         }
 
         return total / datasetLength;
@@ -20,18 +20,18 @@ abstract class PredictFunction {
 }
 
 class Matrix {
-    private final float[][] entries;
+    private final double[][] entries;
 
     Matrix(Vector v, boolean columnVector) {
         if(columnVector) {
-            entries = new float[v.size()][1];
+            entries = new double[v.size()][1];
 
             for(int i=0;i<v.size();i++) {
                 entries[i][0] = v.x(i);
             }
         }
         else {
-            entries = new float[1][v.size()];
+            entries = new double[1][v.size()];
 
             for(int i=0;i<v.size();i++) {
                 entries[0][i] = v.x(i);
@@ -39,12 +39,12 @@ class Matrix {
         }
     }
 
-    Matrix(float[]... data) {
+    Matrix(double[]... data) {
         entries = data;
     }
 
     Matrix(int width, int height) {
-        entries = new float[width][height];
+        entries = new double[width][height];
     }
 
     public Vector[] mul(Matrix mat) throws Exception {
@@ -61,7 +61,7 @@ class Matrix {
             newMat[i] = new Vector(shape.second);
 
             for(int j=0;j<shape.second;j++) {
-                float total = 0;
+                double total = 0;
 
                 for(int k=0;k<common;k++) {
                     total += entries[i][k] * mat.entries[k][j];
@@ -160,7 +160,7 @@ class Matrix {
         return vectors;
     }
 
-    public Matrix scale(float scale) {
+    public Matrix scale(double scale) {
         for(int i=0;i<entries.length;i++) {
             for(int j=0;j<entries[0].length;j++) {
                 entries[i][j]  *= scale;
@@ -171,7 +171,7 @@ class Matrix {
     }
 
     public static Matrix transpose(Vector[] mat) {
-        float[][] answer = new float[mat[0].size()][mat.length];
+        double[][] answer = new double[mat[0].size()][mat.length];
 
         for(int i=0;i<mat.length;i++){
             for(int j=0;j<mat[0].size();j++) {
@@ -185,26 +185,36 @@ class Matrix {
 
 class Vector {
 
-    private final float[] points;
-    Vector(float... points){
+    private final double[] points;
+    Vector(double... points){
         this.points = points;
     }
 
     Vector(int size){
-        points = new float[size];
+        points = new double[size];
     }
 
     Vector(int size, double value){
-        points = new float[size];
+        points = new double[size];
 
-        Arrays.fill(points, (float) value);
+        Arrays.fill(points, (double) value);
     }
 
     Vector(Object[] data) {
-        points = new float[data.length];
+        points = new double[data.length];
 
         for(int i=0;i<points.length;i++){
-            points[i] = ((Double)data[i]).floatValue();
+            points[i] = (Double) data[i];
+        }
+    }
+
+    Vector(String data) {
+        String[] list = data.split("\t");
+
+        points = new double[list.length];
+
+        for(int i=0;i<points.length;i++) {
+            points[i] = Double.parseDouble(list[i]);
         }
     }
 
@@ -215,14 +225,14 @@ class Vector {
             throw new Exception("Can't flatten this one!");
         }
         else if(twoD.length == 1) {
-            points = new float[twoD[0].size()];
+            points = new double[twoD[0].size()];
 
             for(int i=0;i<twoD[0].size();i++) {
                 points[i] = twoD[0].x(i);
             }
         }
         else {
-            points = new float[twoD.length];
+            points = new double[twoD.length];
 
             for(int j=0;j<twoD.length;j++) {
                 points[j] = twoD[j].x(0);
@@ -230,11 +240,11 @@ class Vector {
         }
     }
 
-    float x(int i){
+    double x(int i){
         return points[i];
     }
 
-    void setX(int pos, float value){
+    void setX(int pos, double value){
         points[pos] = value;
     }
 
@@ -242,13 +252,13 @@ class Vector {
         return points.length;
     }
 
-    float dot(Vector w) {
+    double dot(Vector w) {
         if(points.length != w.size()){
-            return Float.NaN;
+            return Double.NaN;
         }
 
         int n = points.length;
-        float total = 0;
+        double total = 0;
         for(int i=0;i<n;i++){
             total += points[i] * w.x(i);
         }
@@ -262,7 +272,7 @@ class Vector {
         }
     }
 
-    Vector scaleBy(float x){
+    Vector scaleBy(double x){
         for(int i=0;i<points.length;i++){
             points[i] *= x;
         }
@@ -270,10 +280,10 @@ class Vector {
         return this;
     }
 
-    float sum(){
-        float total = 0;
+    double sum(){
+        double total = 0;
 
-        for (float point : points) {
+        for (double point : points) {
             total += point;
         }
 
@@ -304,11 +314,11 @@ class Vector {
         Random random = new Random();
 
         for(int i=0;i<points.length;i++) {
-            points[i] = random.nextFloat();
+            points[i] = random.nextDouble();
         }
     }
 
-    Vector divide(Vector v, float eps) throws Exception {
+    Vector divide(Vector v, double eps) throws Exception {
         Vector answer = new Vector(v.size());
 
         if(v.size() != points.length) {
@@ -334,7 +344,7 @@ class Vector {
         Vector v = new Vector(points.length);
 
         for(int i=0;i<v.size();i++) {
-            v.setX(i, (float) Math.sqrt(points[i]));
+            v.setX(i, (double) Math.sqrt(points[i]));
         }
 
         return v;
@@ -343,13 +353,10 @@ class Vector {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-
-        builder.append("(");
+;
         for(int i=0;i<points.length;i++) {
-            builder.append(points[i] + ", ");
+            builder.append(points[i] + "\t");
         }
-
-        builder.append(")");
 
         return builder.toString();
     }
@@ -357,23 +364,23 @@ class Vector {
 
 class PolynomialPredictor extends PredictFunction{
     @Override
-    public float predict(Vector x, Vector w, float b) {
+    public double predict(Vector x, Vector w, double b) {
         return x.dot(w) + b;
     }
 
     @Override
-    public Vector derivativeByW(Vector w, float b, Pair<Vector, Float>[] dataset) {
+    public Vector derivativeByW(Vector w, double b, Pair<Vector, Double>[] dataset) {
         Vector derivative = new Vector(w.size());
 
         int datasetLength = dataset.length;
         int features = w.size();
 
         for(int i=0;i<features;i++){
-            for (Pair<Vector, Float> vectorFloatPair : dataset) {
-                float curr = derivative.x(i);
+            for (Pair<Vector, Double> vectordoublePair : dataset) {
+                double curr = derivative.x(i);
 
-                curr += vectorFloatPair.first.x(i) *
-                        (predict(vectorFloatPair.first, w, b) - vectorFloatPair.second);
+                curr += vectordoublePair.first.x(i) *
+                        (predict(vectordoublePair.first, w, b) - vectordoublePair.second);
                 derivative.setX(i, curr);
             }
 

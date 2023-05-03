@@ -2,11 +2,11 @@ package org.example;
 
 public class MSE implements SimpleNeuralNetwork.Loss {
     @Override
-    public float loss(Vector v, Vector y) {
-        float loss = 0;
+    public double loss(Vector v, Vector y) {
+        double loss = 0;
 
         for(int i=0;i<v.size();i++) {
-            float term = v.x(i) - y.x(i);
+            double term = v.x(i) - y.x(i);
 
             loss += (term * term) / 2;
         }

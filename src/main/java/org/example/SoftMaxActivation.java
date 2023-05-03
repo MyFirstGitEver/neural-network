@@ -7,8 +7,8 @@ public class SoftMaxActivation extends ActivationFunction {
 
     @Override
     Vector out(Vector z) {
-        float total = 0;
-        float max = Float.MIN_VALUE;
+        double total = 0;
+        double max = Double.MIN_VALUE;
 
         for(int i=0;i<z.size();i++) {
             max = Math.max(max, z.x(i));
@@ -20,16 +20,16 @@ public class SoftMaxActivation extends ActivationFunction {
 
         Vector a = new Vector(z.size());
         for(int i=0;i<z.size();i++) {
-            a.setX(i, (float) (Math.exp(z.x(i) - max) / total));
+            a.setX(i, (double) (Math.exp(z.x(i) - max) / total));
         }
 
         return a;
     }
 
     @Override
-    Vector derivativeAtZ(Vector z, Vector y) {
+    Vector derivativeByZ(Vector z, Vector y) {
         int subscript = -1;
-        float mainA = -1;
+        double mainA = -1;
 
         Vector a = out(z);
 
@@ -51,22 +51,5 @@ public class SoftMaxActivation extends ActivationFunction {
         }
 
         return a;
-    }
-
-    @Override
-    Vector[] getW() {
-        Vector[] W  = new Vector[1];
-        W[0] = new Vector(featureSize);
-        W[0].randomise();
-
-        return W;
-    }
-
-    @Override
-    Vector getB() {
-        Vector b = new Vector(1);
-
-        b.randomise();
-        return b;
     }
 }

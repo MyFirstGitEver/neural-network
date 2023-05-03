@@ -2,10 +2,10 @@ package org.example;
 
 public class LinearRegression {
     private final PredictFunction predictor;
-    private final Pair<Vector, Float>[] dataset;
+    private final Pair<Vector, Double>[] dataset;
     private final Vector w;
-    private float b;
-    LinearRegression(PredictFunction predictor, Pair<Vector, Float>[] dataset) {
+    private double b;
+    LinearRegression(PredictFunction predictor, Pair<Vector, Double>[] dataset) {
         this.predictor = predictor;
         this.dataset = dataset;
 
@@ -15,27 +15,27 @@ public class LinearRegression {
 
 
     // R-squared error
-    public float cost() {
+    public double cost() {
         int n = dataset.length;
-        float total = 0;
+        double total = 0;
 
-        for(Pair<Vector, Float> p : dataset){
-            float term = (p.second - predictor.predict(p.first, w, b));
+        for(Pair<Vector, Double> p : dataset){
+            double term = (p.second - predictor.predict(p.first, w, b));
             total += term * term;
         }
 
         return total / (2 * n);
     }
 
-    public float predict(Vector x) {
+    public double predict(Vector x) {
         if(x.size() != w.size()){
-            return Float.NaN;
+            return Double.NaN;
         }
 
         return predictor.predict(x, w, b);
     }
 
-    public void train(float learningRate, int iter) {
+    public void train(double learningRate, int iter) {
         int iteration = 0;
 
         while(Math.abs(cost()) > 0.0001 && iteration < iter) {

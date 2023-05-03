@@ -19,25 +19,25 @@ public class MatrixTesting {
     }
 
     public static Stream<Arguments> cases2() {
-        float[][] first1 = {
+        double[][] first1 = {
                 {1, 2, 3},
                 {3, 4, 5},
                 {-3, -6, -7}
         };
 
-        float[][] first2 = {
+        double[][] first2 = {
                 {1, 6},
                 {-3, 10},
                 {3, -3}
         };
 
-        float[][] answer = {
+        double[][] answer = {
                 {4, 17},
                 {6, 43},
                 {-6, -57}
         };
 
-        float[][] second1 = {
+        double[][] second1 = {
                 {-5, 10},
                 {10, -8},
                 {1, 0},
@@ -45,12 +45,12 @@ public class MatrixTesting {
                 {10, 19}
         };
 
-        float[][] second2 = {
+        double[][] second2 = {
                 {5, 1, 1},
                 {6, 2, 15},
         };
 
-        float[][] answer2 = {
+        double[][] answer2 = {
                 {35, 15, 145},
                 {2, -6, -110},
                 {5, 1, 1},

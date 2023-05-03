@@ -69,7 +69,7 @@ class ExcelReader {
                 break;
             }
 
-            float[]  points = new float[data.length - 1];
+            double[]  points = new double[data.length - 1];
             Vector label = new Vector(2);
             int index = 0;
 
@@ -105,7 +105,7 @@ class ExcelReader {
                     continue;
                 }
 
-                points[index] = (float) numericValue;
+                points[index] = numericValue;
                 index++;
             }
 

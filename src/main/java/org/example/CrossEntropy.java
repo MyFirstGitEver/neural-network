@@ -2,10 +2,10 @@ package org.example;
 
 public class CrossEntropy implements SimpleNeuralNetwork.Loss {
     @Override
-    public float loss(Vector v, Vector y) throws Exception {
+    public double loss(Vector v, Vector y) throws Exception {
         for(int i=0;i<y.size();i++) {
             if(y.x(i) == 1) {
-                return (float) -Math.log(v.x(i) + 0.00001f);
+                return -Math.log(v.x(i) + 0.00001f);
             }
         }
 
@@ -16,17 +16,15 @@ public class CrossEntropy implements SimpleNeuralNetwork.Loss {
     public Vector derivativeByA(Vector A, Vector Y) {
         Vector derivative = new Vector(A.size());
 
+        double deri = 0;
         for(int i=0;i<Y.size();i++) {
             if(Y.x(i) == 1) {
-                if(Double.isNaN(-1 / (A.x(i) + 10e-5f))) {
-                    int m = 3;
-                }
+                deri = -1 / (A.x(i) + 1e-15f);
+            }
+        }
 
-                derivative.setX(i, -1 / (A.x(i) + 10e-5f));
-            }
-            else{
-                derivative.setX(i, 0);
-            }
+        for(int i=0;i<Y.size();i++) {
+            derivative.setX(i, deri);
         }
 
         return derivative;

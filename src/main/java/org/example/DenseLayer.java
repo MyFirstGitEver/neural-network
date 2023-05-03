@@ -1,7 +1,5 @@
 package org.example;
 
-import java.util.Arrays;
-
 abstract class ActivationFunction {
     protected final int featureSize;
     protected final int neurons;
@@ -12,16 +10,41 @@ abstract class ActivationFunction {
     }
 
     abstract Vector out(Vector z);
-    abstract Vector derivativeAtZ(Vector z, Vector y);
-    abstract Vector[] getW();
-    abstract Vector getB();
+    abstract Vector derivativeByZ(Vector z, Vector y);
+
+    Vector[] getW() {
+        Vector[] W = new Vector[neurons];
+
+        for(int i=0;i<W.length;i++) {
+            W[i] = new Vector(featureSize);
+            W[i].randomise();
+        }
+
+        return W;
+    }
+
+    Vector getB() {
+        Vector b = new Vector(neurons);
+        b.randomise();
+
+        return b;
+    }
+    Vector z(Vector[] W, Vector B, Vector v) {
+        double[] points = new double[neurons];
+
+        for(int i=0;i<neurons;i++) {
+            points[i] = W[i].dot(v) + B.x(i);
+        }
+
+        return new Vector(points);
+    }
 }
 
 public class DenseLayer {
     private final ActivationFunction function;
 
     private final Vector[] W;
-    private final Vector B;
+    private Vector B;
 
     public DenseLayer(ActivationFunction function) {
         this.function = function;
@@ -36,14 +59,21 @@ public class DenseLayer {
         }
 
         // Calculate z for activation function
-        float[] points = new float[function.neurons];
+        Vector z = function.z(W, B, v);
 
-        for(int i=0;i<function.neurons;i++) {
-            points[i] = W[i].dot(v) + B.x(i);
-        }
-
-        Vector z = new Vector(points);
         return new Pair<>(z, function.out(z));
+    }
+
+    public Vector[] getW() {
+        return W;
+    }
+
+    public Vector getB() {
+        return B;
+    }
+
+    public void setB(Vector B) {
+        this.B = B;
     }
 
     public void update(
@@ -51,7 +81,7 @@ public class DenseLayer {
             Vector[] secondMomentW,
             Vector firstMomentB,
             Vector secondMomentB,
-            float learningRate)
+            double learningRate)
             throws Exception {
 
         for(int i=0;i<firstMomentW.length;i++) {
@@ -64,7 +94,7 @@ public class DenseLayer {
     }
 
     public Vector derivativeByZ(Vector Z, Vector y) {
-        return function.derivativeAtZ(Z, y);
+        return function.derivativeByZ(Z, y);
     }
 
     public Matrix transposeOfW() {

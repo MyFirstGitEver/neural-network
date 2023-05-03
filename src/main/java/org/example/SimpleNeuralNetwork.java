@@ -1,16 +1,18 @@
 package org.example;
 
+import java.io.*;
+
 public class SimpleNeuralNetwork {
     interface Loss {
-        float loss(Vector v, Vector y) throws Exception;
+        double loss(Vector v, Vector y) throws Exception;
         Vector derivativeByA(Vector A, Vector Y);
     }
 
     private final DenseLayer[] layers;
     private final Loss loss;
     private final Pair<Vector, Vector>[] dataset;
-    private final static float beta = 0.9f;
-    private final static float beta2 = 0.999f;
+    private final static double beta = 0.9f;
+    private final static double beta2 = 0.999f;
 
     public SimpleNeuralNetwork(DenseLayer[] layers, Loss loss, Pair<Vector, Vector>[] dataset) {
         this.layers = layers;
@@ -28,8 +30,8 @@ public class SimpleNeuralNetwork {
         return curr;
     }
 
-    public void train(float learningRate, int iter) throws Exception {
-        float cost;
+    public void train(double learningRate, int iter, int batchSize) throws Exception {
+        double cost;
         int iteration = 0;
 
         // dW and dB holds current gradient update
@@ -59,7 +61,7 @@ public class SimpleNeuralNetwork {
                 System.out.println(iteration + " iterations have passed. Cost: " + cost);
             }
 
-            for(int j=0;j<dataset.length - 15;j+= 15) {
+            for(int j=0;j<dataset.length;j+= Math.min(batchSize, dataset.length - j)) {
                 for (Matrix matrix : dW) {
                     matrix.reset();
                 }
@@ -68,7 +70,7 @@ public class SimpleNeuralNetwork {
                     v.reset();
                 }
 
-                computeGradient(j, j + 15, dW, dB);
+                computeGradient(j, j + Math.min(batchSize - 1, dataset.length - 1 - j), dW, dB);
 
                 int m = 3;
 
@@ -91,8 +93,8 @@ public class SimpleNeuralNetwork {
         }
     }
 
-    public float cost() throws Exception {
-        float total = 0;
+    public double cost() throws Exception {
+        double total = 0;
 
         for(Pair<Vector, Vector> p : dataset) {
             total += loss.loss(predict(p.first), p.second);
@@ -151,5 +153,64 @@ public class SimpleNeuralNetwork {
                 currError = nextError;
             }
         }
+    }
+
+    public void saveParams() throws IOException {
+        File f = new File("layers");
+        f.mkdir();
+
+        for(int i=0;i<layers.length;i++) {
+            File dir = new File(f, "layer " + (i + 1));
+            dir.mkdir();
+
+            BufferedWriter wWriter = new BufferedWriter(new FileWriter(dir.getPath() + "\\w"));
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(dir.getPath() + "\\b"));
+
+            Vector[] w = layers[i].getW();
+
+            for(Vector v : w) {
+                wWriter.write(v.toString());
+                wWriter.newLine();
+            }
+
+            Vector b = layers[i].getB();
+            bWriter.write(b.toString());
+
+            wWriter.close();
+            bWriter.close();
+        }
+    }
+
+    public boolean loadParams() throws IOException {
+        File f = new File("layers");
+
+        if(!f.exists()) {
+            return false;
+        }
+
+        int layerNum = f.listFiles().length;
+        for(int i=0;i<layerNum;i++) {
+            File dir = new File(f, "layer " + (i + 1));
+
+            BufferedReader wReader = new BufferedReader(new FileReader(dir.getPath() + "\\w"));
+            BufferedReader bReader = new BufferedReader(new FileReader(dir.getPath() + "\\b"));
+
+            Vector[] w = layers[i].getW();
+
+            String line;
+
+            int index = 0;
+            while((line = wReader.readLine()) != null) {
+                w[index] = new Vector(line);
+                index++;
+            }
+
+            layers[i].setB(new Vector(bReader.readLine()));
+
+            wReader.close();
+            bReader.close();
+        }
+
+        return true;
     }
 }
