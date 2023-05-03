@@ -30,7 +30,7 @@ public class SimpleNeuralNetwork {
         return curr;
     }
 
-    public void train(double learningRate, int iter, int batchSize) throws Exception {
+    public void train(double learningRate, int iter, int batchSize, String alias) throws Exception {
         double cost;
         int iteration = 0;
 
@@ -58,6 +58,7 @@ public class SimpleNeuralNetwork {
 
         while((cost = cost()) > 0.001f && iteration < iter) {
             if(iteration % 30 == 0) {
+                saveParams(alias);
                 System.out.println(iteration + " iterations have passed. Cost: " + cost);
             }
 
@@ -75,10 +76,10 @@ public class SimpleNeuralNetwork {
                 int m = 3;
 
                 for(int i=0;i<layers.length;i++) {
-                    firstMomentW[i].scale(beta).add(dW[i].scale(1 - beta));
+                    firstMomentW[i].scale(beta).add(dW[i].copy().scale(1 - beta));
                     secondMomentW[i].scale(beta2).add(dW[i].square().scale(1 - beta2));
 
-                    firstMomentB[i].scaleBy(beta).add(dB[i].scaleBy(1 - beta));
+                    firstMomentB[i].scaleBy(beta).add(dB[i].copy().scaleBy(1 - beta));
                     secondMomentB[i].scaleBy(beta2).add(dB[i].square().scaleBy(1 - beta2));
 
                     layers[i].update(
@@ -155,16 +156,17 @@ public class SimpleNeuralNetwork {
         }
     }
 
-    public void saveParams() throws IOException {
-        File f = new File("layers");
+    public void saveParams(String alias) throws IOException {
+
+        File f = new File("layers" + alias);
         f.mkdir();
 
         for(int i=0;i<layers.length;i++) {
-            File dir = new File(f, "layer " + (i + 1));
+            File dir = new File(f.getAbsolutePath() + "\\layer " + (i + 1));
             dir.mkdir();
 
-            BufferedWriter wWriter = new BufferedWriter(new FileWriter(dir.getPath() + "\\w"));
-            BufferedWriter bWriter = new BufferedWriter(new FileWriter(dir.getPath() + "\\b"));
+            BufferedWriter wWriter = new BufferedWriter(new FileWriter(dir.getAbsolutePath() + "\\w"));
+            BufferedWriter bWriter = new BufferedWriter(new FileWriter(dir.getAbsolutePath() + "\\b"));
 
             Vector[] w = layers[i].getW();
 
@@ -181,8 +183,8 @@ public class SimpleNeuralNetwork {
         }
     }
 
-    public boolean loadParams() throws IOException {
-        File f = new File("layers");
+    public boolean loadParams(String alias) throws IOException {
+        File f = new File("layers" + alias);
 
         if(!f.exists()) {
             return false;
@@ -192,8 +194,8 @@ public class SimpleNeuralNetwork {
         for(int i=0;i<layerNum;i++) {
             File dir = new File(f, "layer " + (i + 1));
 
-            BufferedReader wReader = new BufferedReader(new FileReader(dir.getPath() + "\\w"));
-            BufferedReader bReader = new BufferedReader(new FileReader(dir.getPath() + "\\b"));
+            BufferedReader wReader = new BufferedReader(new FileReader(dir.getAbsolutePath() + "\\w"));
+            BufferedReader bReader = new BufferedReader(new FileReader(dir.getAbsolutePath() + "\\b"));
 
             Vector[] w = layers[i].getW();
 

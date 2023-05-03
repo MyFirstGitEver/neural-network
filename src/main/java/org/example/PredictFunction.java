@@ -136,6 +136,18 @@ class Matrix {
         return this;
     }
 
+    public Matrix copy() {
+        double[][] newMat = new double[entries.length][entries[0].length];
+
+        for(int i=0;i<newMat.length;i++) {
+            for(int j=0;j<entries[0].length;j++) {
+                newMat[i][j] = entries[i][j];
+            }
+        }
+
+        return new Matrix(newMat);
+    }
+
     public Vector[] vectorize(boolean byRow) {
         if(byRow) {
             Vector[] vectors = new Vector[entries.length];
@@ -185,7 +197,7 @@ class Matrix {
 
 class Vector {
 
-    private final double[] points;
+    private double[] points;
     Vector(double... points){
         this.points = points;
     }
@@ -280,6 +292,12 @@ class Vector {
         return this;
     }
 
+    Vector copy() {
+        double[] newVec = new double[points.length];
+
+        return new Vector(Arrays.copyOfRange(newVec, 0, newVec.length));
+    }
+
     double sum(){
         double total = 0;
 
@@ -314,7 +332,7 @@ class Vector {
         Random random = new Random();
 
         for(int i=0;i<points.length;i++) {
-            points[i] = random.nextDouble();
+            points[i] = random.nextDouble() + 0.0001f;
         }
     }
 
@@ -344,10 +362,40 @@ class Vector {
         Vector v = new Vector(points.length);
 
         for(int i=0;i<v.size();i++) {
-            v.setX(i, (double) Math.sqrt(points[i]));
+            v.setX(i, Math.sqrt(points[i]));
         }
 
         return v;
+    }
+
+    public void concat(Vector v) {
+        double[] newVec = new double[size() + v.size()];
+
+        System.arraycopy(points, 0, newVec, 0, points.length);
+
+        for (int i = points.length; i < newVec.length; i++) {
+            newVec[i] = v.x(i - points.length);
+        }
+
+        points = newVec;
+    }
+
+    public void normalise() {
+        float length = 0.0f;
+
+        for (int i = 0; i < points.length; i++) {
+            length += points[i] * points[i];
+        }
+
+        length = (float) Math.sqrt(length);
+
+        if (length == 0) {
+            return;
+        }
+
+        for (int i = 0; i < points.length; i++) {
+            points[i] /= length;
+        }
     }
 
     @Override

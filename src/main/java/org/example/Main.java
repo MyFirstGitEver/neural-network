@@ -1,5 +1,7 @@
 package org.example;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Random;
@@ -33,42 +35,112 @@ import java.util.Random;
 //
 //        neuralTest(xTest, model);
 //        normalRegression(xTrain2, xTest2);
+// --------------------------------------------
 
+//        ExcelReader reader = new ExcelReader("D:\\Source code\\Data\\Titanic\\train.xlsx");
+//        Pair<Vector, Vector>[] dataset = reader.createLabeledDataset(0, 0, 0);
+//        reader = new ExcelReader("D:\\Source code\\Data\\Titanic\\test.xlsx");
+//        Pair<Vector, Vector>[] testSet = reader.createLabeledDataset(0, 0, 0);
+//
+//        SimpleNeuralNetwork model = new SimpleNeuralNetwork(new DenseLayer[] {
+//                new DenseLayer(new ReluActivation(dataset[0].first.size(), 10)),
+//                new DenseLayer(new ReluActivation(10, 5)),
+//                new DenseLayer(new ReluActivation(5, 10)),
+//                new DenseLayer(new SoftMaxActivation(10, 2)),
+//        }, new CrossEntropy(), dataset);
+//
+//        //0.00001f
+//        if(!model.loadParams()) {
+//            model.train(0.00001f, 10_000, 60);
+//            model.saveParams();
+//        }
+//
+//        System.out.println("Cost of training set is: " + model.cost());
+//
+//        int hit = 0;
+//
+//        for (Pair<Vector, Vector> vectorVectorPair : testSet) {
+//            Vector confidence = model.predict(vectorVectorPair.first);
+//
+//            if (confidence.x(0) >= confidence.x(1) && vectorVectorPair.second.x(0) == 1) {
+//                hit++;
+//            } else if (confidence.x(0) < confidence.x(1) && vectorVectorPair.second.x(1) == 1) {
+//                hit++;
+//            }
+//        }
+//
+//        System.out.println("Accuracy reached: " + (double)hit / testSet.length * 100 + " %");
 public class Main {
     public static void main(String[] args) throws Exception {
-        ExcelReader reader = new ExcelReader("D:\\Source code\\Data\\Titanic\\train.xlsx");
-        Pair<Vector, Vector>[] dataset = reader.createLabeledDataset(0, 0, 0);
-        reader = new ExcelReader("D:\\Source code\\Data\\Titanic\\test.xlsx");
-        Pair<Vector, Vector>[] testSet = reader.createLabeledDataset(0, 0, 0);
+//        int total = 0;
+//
+//        for(int i=0;i<=9;i++) {
+//            File folder = new File("D:\\Source code\\Data\\MNIST\\training\\" + i);
+//            total += folder.listFiles().length;
+//        }
+//
+//        Pair<Vector, Vector>[] dataset = new Pair[total];
+//
+//        int index = 0;
+//        for(int i=0;i<=9;i++) {
+//            File folder = new File("D:\\Source code\\Data\\MNIST\\training\\" + i);
+//
+//            for(File f : folder.listFiles()) {
+//                Vector label = new Vector(10);
+//                label.setX(i, 1);
+//
+//                Vector v = new ImageProcessing(f.getAbsolutePath()).hog(4);
+//                dataset[index] = new Pair<>(v, label);
+//                index++;
+//            }
+//        }
+
+        //normalise(dataset, "");
+        //dataset[0].first.size()
 
         SimpleNeuralNetwork model = new SimpleNeuralNetwork(new DenseLayer[] {
-                new DenseLayer(new ReluActivation(dataset[0].first.size(), 10)),
-                new DenseLayer(new ReluActivation(10, 5)),
-                new DenseLayer(new ReluActivation(5, 10)),
-                new DenseLayer(new SoftMaxActivation(10, 2)),
-        }, new CrossEntropy(), dataset);
+                new DenseLayer(new ReluActivation(1, 10)),
+                new DenseLayer(new SoftMaxActivation(10, 10)),
+        }, new CrossEntropy(), null);
 
-        //0.00001f
-        if(!model.loadParams()) {
-            model.train(0.00001f, 10_000, 60);
-            model.saveParams();
+        model.loadParams("MNIST");
+        //model.train(0.00001f, 300, 100, "MNIST");
+        //model.saveParams("MNIST");
+
+        for(int i=0;i<=9;i++) {
+            testDigit(model, i);
         }
 
-        System.out.println("Cost of training set is: " + model.cost());
+
+    }
+
+    static void testDigit(SimpleNeuralNetwork model, int digit) throws IOException {
+        File test = new File("D:\\Source code\\Data\\MNIST\\testing\\" + digit);
+        File[] allImages = test.listFiles();
 
         int hit = 0;
+        double length = allImages.length;
 
-        for (Pair<Vector, Vector> vectorVectorPair : testSet) {
-            Vector confidence = model.predict(vectorVectorPair.first);
+        for(File f : allImages) {
+            Vector hog = new ImageProcessing(f.getAbsolutePath()).hog(4);
+            Vector confidence = model.predict(hog);
 
-            if (confidence.x(0) >= confidence.x(1) && vectorVectorPair.second.x(0) == 1) {
-                hit++;
-            } else if (confidence.x(0) < confidence.x(1) && vectorVectorPair.second.x(1) == 1) {
+            int maxIndex = 0;
+            double maxLevel = Double.MIN_VALUE;
+
+            for(int i=0;i<confidence.size();i++) {
+                if(maxLevel < confidence.x(i)) {
+                    maxLevel = confidence.x(i);
+                    maxIndex = i;
+                }
+            }
+
+            if(maxIndex == digit) {
                 hit++;
             }
         }
 
-        System.out.println("Accuracy reached: " + (double)hit / testSet.length * 100 + " %");
+        System.out.println("Accuracy recognising digit " + digit + ": " +hit / length * 100);
     }
 
     static void normalise(Pair<Vector, Vector>[] xTrain, Pair<Vector, Vector>[] xTest) {
@@ -93,7 +165,7 @@ public class Main {
         }
 
         for(int i=0;i<std.length;i++) {
-            std[i] = Math.sqrt(std[i]);
+            std[i] = Math.sqrt(std[i] / xTrain.length);
         }
 
         // Normalise
