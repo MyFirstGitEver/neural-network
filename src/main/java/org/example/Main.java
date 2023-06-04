@@ -95,7 +95,6 @@ public class Main {
 //            }
 //        }
 
-        //normalise(dataset, "");
         //dataset[0].first.size()
 
         SimpleNeuralNetwork model = new SimpleNeuralNetwork(new DenseLayer[] {
@@ -110,15 +109,15 @@ public class Main {
         for(int i=0;i<=9;i++) {
             testDigit(model, i);
         }
-
-
     }
 
     static void testDigit(SimpleNeuralNetwork model, int digit) throws IOException {
+        System.out.println("-----Testing digit " + digit + "-----");
+
         File test = new File("D:\\Source code\\Data\\MNIST\\testing\\" + digit);
         File[] allImages = test.listFiles();
 
-        int hit = 0;
+        int hit = 0, timer = 0;
         double length = allImages.length;
 
         for(File f : allImages) {
@@ -138,11 +137,15 @@ public class Main {
             if(maxIndex == digit) {
                 hit++;
             }
+
+            timer++;
+            if(timer % 100 == 0) {
+                System.out.println("Tested on " + timer + " images. Hit: " + hit);
+            }
         }
 
-        System.out.println("Accuracy recognising digit " + digit + ": " +hit / length * 100);
+        System.out.println("Accuracy recognising digit " + digit + ": " + hit / length * 100 + "%\n\n");
     }
-
     static void normalise(Pair<Vector, Vector>[] xTrain, Pair<Vector, Vector>[] xTest) {
         Double[] mean = new Double[xTrain[0].first.size()];
         Double[] std = new Double[xTrain[0].first.size()];
