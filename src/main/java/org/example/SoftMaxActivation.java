@@ -8,7 +8,7 @@ public class SoftMaxActivation extends ActivationFunction {
     @Override
     Vector out(Vector z) {
         double total = 0;
-        double max = Double.MIN_VALUE;
+        double max = -Double.MAX_VALUE;
 
         for(int i=0;i<z.size();i++) {
             max = Math.max(max, z.x(i));
