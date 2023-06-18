@@ -137,3 +137,5 @@ Tested on 800 images. Hit: 771
 Tested on 900 images. Hit: 870  
 Tested on 1000 images. Hit: 966  
 Accuracy recognising digit 9: 96.63032705649157%  
+
+This implementation is tested in: https://github.com/MyFirstGitEver/general-neural-network  
