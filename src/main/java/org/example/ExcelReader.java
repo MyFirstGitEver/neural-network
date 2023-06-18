@@ -24,7 +24,7 @@ class ExcelReader {
         fIn.close();
     }
 
-    private Object[] getRow(int number, int sheetNum) throws Exception {
+    Object[] getRow(int number, int sheetNum) throws Exception {
         XSSFSheet sheet = workbook.getSheetAt(sheetNum);
 
         int last;

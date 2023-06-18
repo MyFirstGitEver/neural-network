@@ -1,15 +1,11 @@
 package org.example;
 
-public class Pair<X, Y>{
+public final class Pair<X, Y> {
     public X first;
     public Y second;
 
-    Pair(){
-
-    }
-
-    Pair(X x, Y y){
-        this.first = x;
-        this.second = y;
+    public Pair(X first, Y second) {
+        this.first = first;
+        this.second = second;
     }
 }

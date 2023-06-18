@@ -1,4 +1,6 @@
-package org.example;
+package org.example.neural;
+
+import org.example.Vector;
 
 public class MSE implements SimpleNeuralNetwork.Loss {
     @Override

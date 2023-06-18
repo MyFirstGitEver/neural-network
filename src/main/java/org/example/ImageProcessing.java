@@ -102,15 +102,15 @@ public class ImageProcessing {
                     double distFromLower = gradient[i][j] - lower * 20;
                     double distFromUpper = upper * 20 - gradient[i][j];
 
-                    hist.setX((int) lower, (double) (magnitude[i][j].x(0) * distFromUpper / 20 +
+                    hist.setX((int) lower, (magnitude[i][j].x(0) * distFromUpper / 20 +
                             hist.x((int) lower)));
 
                     if(upper < 9){
-                        hist.setX((int) upper, (double) (magnitude[i][j].x(0) * distFromLower / 20 +
+                        hist.setX((int) upper, (magnitude[i][j].x(0) * distFromLower / 20 +
                                 hist.x((int) upper)));
                     }
                     else{
-                        hist.setX(0, (double) (magnitude[i][j].x(0) * distFromLower / 20 +
+                        hist.setX(0, (magnitude[i][j].x(0) * distFromLower / 20 +
                                 hist.x(0)));
                     }
                 }
